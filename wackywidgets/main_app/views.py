@@ -1,31 +1,26 @@
-from django.shortcuts import render
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import ListView, DetailView
+from django.shortcuts import render, redirect
 from .models import Widget
 from .forms import WidgetForm
 
-class WidgetList(ListView):
-  model = Widget
-
-class WidgetDetail(DetailView):
-  model = Widget
-
-class WidgetCreate(CreateView):
-  model = Widget
-  fields = '__all__'
-
-class WidgetUpdate(UpdateView):
-  model = Widget
-  fields = '__all__'
-
-class WidgetDelete(DeleteView):
-  model = Widget
-  success_url = ''
+# Create your views here.
 
 def home(request):
-    widget = Widget.objects.all()
-    widget_form = WidgetForm()
-    return render(request, 'main.html', {
-        'widget': widget, 'widget_form': widget_form
-        })
+	widgets = Widget.objects.all()
+	widget_form = WidgetForm()
+	return render(request, 'main.html', { 
+		'widgets': widgets, 
+		'widget_form': widget_form 
+		})
+
+
+def add_widget(request):
+	form = WidgetForm(request.POST)
+	if form.is_valid():
+		form.save()
+	return redirect('home')
+
+
+def delete_widget(request, widget_id):
+	Widget.objects.get(id=widget_id).delete()
+	return redirect('home')
 
